@@ -1,0 +1,355 @@
+/***************************************************************
+ * Name:      Calculator2Main.cpp
+ * Purpose:   Code for Application Frame
+ * Author:    Neal Miskin ()
+ * Created:   2019-01-22
+ * Copyright: Neal Miskin ()
+ * License:
+ **************************************************************/
+
+#include "Calculator2Main.h"
+#include <wx/msgdlg.h>
+#include <wx/event.h>
+#include <iostream>
+
+//(*InternalHeaders(Calculator2Frame)
+#include <wx/intl.h>
+#include <wx/string.h>
+//*)
+
+//helper functions
+enum wxbuildinfoformat {
+    short_f, long_f };
+
+wxString wxbuildinfo(wxbuildinfoformat format){
+    wxString wxbuild(wxVERSION_STRING);
+
+    if (format == long_f )
+    {
+#if defined(__WXMSW__)
+        wxbuild << _T("-Windows");
+#elif defined(__UNIX__)
+        wxbuild << _T("-Linux");
+#endif
+
+#if wxUSE_UNICODE
+        wxbuild << _T("-Unicode build");
+#else
+        wxbuild << _T("-ANSI build");
+#endif // wxUSE_UNICODE
+    }
+
+    return wxbuild;
+}
+
+//(*IdInit(Calculator2Frame)
+const long Calculator2Frame::ID_TEXTCTRL1 = wxNewId();
+const long Calculator2Frame::ID_TEXTCTRL2 = wxNewId();
+const long Calculator2Frame::ID_RADIOBUTTON1 = wxNewId();
+const long Calculator2Frame::ID_RADIOBUTTON2 = wxNewId();
+const long Calculator2Frame::ID_RADIOBUTTON3 = wxNewId();
+const long Calculator2Frame::ID_RADIOBUTTON4 = wxNewId();
+const long Calculator2Frame::ID_BUTTON1 = wxNewId();
+const long Calculator2Frame::ID_BUTTON2 = wxNewId();
+const long Calculator2Frame::ID_TEXTCTRL3 = wxNewId();
+const long Calculator2Frame::ID_STATICTEXT1 = wxNewId();
+const long Calculator2Frame::ID_STATICTEXT2 = wxNewId();
+const long Calculator2Frame::ID_STATICTEXT3 = wxNewId();
+const long Calculator2Frame::ID_BUTTON3 = wxNewId();
+const long Calculator2Frame::ID_BUTTON4 = wxNewId();
+const long Calculator2Frame::ID_PANEL1 = wxNewId();
+const long Calculator2Frame::idMenuQuit = wxNewId();
+const long Calculator2Frame::idMenuAbout = wxNewId();
+const long Calculator2Frame::ID_STATUSBAR1 = wxNewId();
+//*)
+
+BEGIN_EVENT_TABLE(Calculator2Frame,wxFrame)
+    //(*EventTable(Calculator2Frame)
+              EVT_NAVIGATION_KEY(Calculator2Frame::OnNavigationKeyEvent)
+              EVT_KEY_DOWN(Calculator2Frame::OnKeyDown)
+    //*)
+END_EVENT_TABLE()
+
+Calculator2Frame::Calculator2Frame(wxWindow* parent,wxWindowID id){
+    //(*Initialize(Calculator2Frame)
+    wxMenuItem* MenuItem2;
+    wxMenuItem* MenuItem1;
+    wxMenu* Menu1;
+    wxMenuBar* MenuBar1;
+    wxMenu* Menu2;
+
+    Create(parent, id, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("id"));
+    SetClientSize(wxSize(370,209));
+    P1 = new wxPanel(this, ID_PANEL1, wxPoint(0,-8), wxSize(360,200), 0, _T("ID_PANEL1"));
+    TC1 = new wxTextCtrl(P1, ID_TEXTCTRL1, wxEmptyString, wxPoint(40,40), wxDefaultSize, wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+    TC2 = new wxTextCtrl(P1, ID_TEXTCTRL2, wxEmptyString, wxPoint(208,40), wxDefaultSize, wxTE_PROCESS_ENTER, wxDefaultValidator, _T("ID_TEXTCTRL2"));
+    AddRBtn = new wxRadioButton(P1, ID_RADIOBUTTON1, _("Add"), wxPoint(40,80), wxDefaultSize, wxRB_SINGLE|wxTAB_TRAVERSAL, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
+    AddRBtn->SetValue(true);
+    SubRBtn = new wxRadioButton(P1, ID_RADIOBUTTON2, _("Subtract"), wxPoint(40,104), wxDefaultSize, wxRB_SINGLE|wxTAB_TRAVERSAL, wxDefaultValidator, _T("ID_RADIOBUTTON2"));
+    MulRBtn = new wxRadioButton(P1, ID_RADIOBUTTON3, _("Multiply"), wxPoint(40,128), wxDefaultSize, wxRB_SINGLE|wxTAB_TRAVERSAL, wxDefaultValidator, _T("ID_RADIOBUTTON3"));
+    DivRBtn = new wxRadioButton(P1, ID_RADIOBUTTON4, _("Divide"), wxPoint(40,152), wxDefaultSize, wxRB_SINGLE|wxTAB_TRAVERSAL, wxDefaultValidator, _T("ID_RADIOBUTTON4"));
+    CalcBtn = new wxButton(P1, ID_BUTTON1, _("Calc"), wxPoint(240,152), wxDefaultSize, wxTAB_TRAVERSAL, wxDefaultValidator, _T("ID_BUTTON1"));
+    CalcBtn->SetDefault();
+    ClearBtn = new wxButton(P1, ID_BUTTON2, _("Clear"), wxPoint(152,152), wxDefaultSize, wxTAB_TRAVERSAL, wxDefaultValidator, _T("ID_BUTTON2"));
+    AnswerBox = new wxTextCtrl(P1, ID_TEXTCTRL3, wxEmptyString, wxPoint(208,120), wxSize(100,24), wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL3"));
+    StaticText1 = new wxStaticText(P1, ID_STATICTEXT1, _("Number:"), wxPoint(40,24), wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+    StaticText2 = new wxStaticText(P1, ID_STATICTEXT2, _("Number:"), wxPoint(208,24), wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+    StaticText3 = new wxStaticText(P1, ID_STATICTEXT3, _("Result:"), wxPoint(208,104), wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+    R2R = new wxButton(P1, ID_BUTTON3, _("<<"), wxPoint(208,80), wxSize(38,20), 0, wxDefaultValidator, _T("ID_BUTTON3"));
+    R2L = new wxButton(P1, ID_BUTTON4, _(">>"), wxPoint(272,80), wxSize(40,20), 0, wxDefaultValidator, _T("ID_BUTTON4"));
+    MenuBar1 = new wxMenuBar();
+    Menu1 = new wxMenu();
+    MenuItem1 = new wxMenuItem(Menu1, idMenuQuit, _("Quit\tAlt-F4"), _("Quit the application"), wxITEM_NORMAL);
+    Menu1->Append(MenuItem1);
+    MenuBar1->Append(Menu1, _("&File"));
+    Menu2 = new wxMenu();
+    MenuItem2 = new wxMenuItem(Menu2, idMenuAbout, _("About\tF1"), _("Show info about this application"), wxITEM_NORMAL);
+    Menu2->Append(MenuItem2);
+    MenuBar1->Append(Menu2, _("Help"));
+    SetMenuBar(MenuBar1);
+    StatusBar1 = new wxStatusBar(this, ID_STATUSBAR1, 0, _T("ID_STATUSBAR1"));
+    int __wxStatusBarWidths_1[1] = { -1 };
+    int __wxStatusBarStyles_1[1] = { wxSB_NORMAL };
+    StatusBar1->SetFieldsCount(1,__wxStatusBarWidths_1);
+    StatusBar1->SetStatusStyles(1,__wxStatusBarStyles_1);
+    SetStatusBar(StatusBar1);
+
+    Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&Calculator2Frame::OnTC1Text);
+    Connect(ID_RADIOBUTTON1,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&Calculator2Frame::AddSelect);
+    Connect(ID_RADIOBUTTON2,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&Calculator2Frame::SubSelect);
+    Connect(ID_RADIOBUTTON3,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&Calculator2Frame::MulSelect);
+    Connect(ID_RADIOBUTTON4,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&Calculator2Frame::DivSelect);
+    Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Calculator2Frame::OnCalcBtnClick);
+    Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Calculator2Frame::ClearFields);
+    Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Calculator2Frame::OnR2RClick);
+    Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Calculator2Frame::OnR2LClick);
+    Connect(idMenuQuit,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Calculator2Frame::OnQuit);
+    Connect(idMenuAbout,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Calculator2Frame::OnAbout);
+    Connect(wxEVT_KEY_DOWN,(wxObjectEventFunction)&Calculator2Frame::OnKeyDown);
+    //*)
+
+}
+
+Calculator2Frame::~Calculator2Frame(){
+    //(*Destroy(Calculator2Frame)
+    //*)
+}
+
+void Calculator2Frame::OnQuit(wxCommandEvent& event){
+    Close();
+}
+
+void Calculator2Frame::OnAbout(wxCommandEvent& event){
+    wxString msg = wxbuildinfo(long_f);
+    wxMessageBox(msg, _("Welcome to..."));
+}
+
+void Calculator2Frame::OnPanel1Paint(wxPaintEvent& event){
+}
+
+void Calculator2Frame::OnClose(wxCloseEvent& event){
+    exit(0);
+}
+
+void Calculator2Frame::OnP1Paint(wxPaintEvent& event){
+}
+
+
+/************************************
+// START OF REAL CODE HERE
+*************************************/
+
+int fs=0; /* Global:Function Selector*/
+double rtn=0; /*Global: Result of calculations*/
+double n1; /*Global:left side of equation*/
+double n2; /*Global: right side of equation*/
+// bool userText = true;
+
+/*Number Cruncher, the actual calculator part*/
+double NumberCrunch(int fs, double n1, double n2){
+
+    switch(fs){
+    case 0:
+        //add
+        rtn=n1+n2;
+        break;
+    case 1:
+        //Subtract
+        rtn=n1-n2;
+        break;
+    case 2:
+        //multiply
+        rtn=n1*n2;
+        break;
+    case 3:
+        //Divide
+        if(n2!=0){
+            rtn=n1/n2;
+        }else {
+            wxMessageBox("Thou shalt NOT divide by zero!");
+        }
+        break;
+    }
+    return rtn;
+}
+
+
+/*OnNavigationKeyEvent() Makes TAB focus work, in theory.*/
+void Calculator2Frame::OnNavigationKeyEvent(wxNavigationKeyEvent& event){
+    wxMessageBox("NavEvt");
+    if(TC1->HasFocus()){
+        TC2->SetFocus();
+    }else if(TC2->HasFocus()){
+        wxMessageBox("FromTC2");
+        AddRBtn->SetFocus();
+    }else if(AddRBtn->HasFocus()){
+        SubRBtn->SetFocus();
+    }else if(SubRBtn->HasFocus()){
+        MulRBtn->SetFocus();
+    }else if(MulRBtn->HasFocus()){
+        DivRBtn->SetFocus();
+    }else if(DivRBtn->HasFocus()){
+        CalcBtn->SetFocus();
+    }else if(CalcBtn->HasFocus()){
+        ClearBtn->SetFocus();
+    }
+}
+
+
+/*OnCalcBtnClick When Calculate Button is clicked, calculate stuff*/
+void Calculator2Frame::OnCalcBtnClick(wxCommandEvent& event)
+{
+    wxString numStr1 = TC1->GetLineText(0);
+    wxString numStr2 = TC2->GetLineText(0);
+    wxString rtnStr;
+
+    if(!numStr1.ToDouble(&n1) || !numStr2.ToDouble(&n2)){
+        if(numStr2.Length() >0){wxMessageBox("Parameter not valid.");}
+    }else {
+        rtn=NumberCrunch(fs, n1, n2);
+        rtnStr << rtn;
+        AnswerPrint(rtnStr);
+    }
+    TC1->SetFocus();
+    TC1->SetSelection(0,TC1->GetLineLength(0));
+}
+
+
+/*Radio Buttons select function, can be called by regular buttons*/
+void Calculator2Frame::AddSelect(wxCommandEvent& event){
+    fs=0;
+    if(!AddRBtn->GetValue()){AddRBtn->SetValue(true);}
+    TC2->SetFocus();
+    if(n1!=0 && n2!=0){Calculator2Frame::OnCalcBtnClick(event);}
+}
+void Calculator2Frame::SubSelect(wxCommandEvent& event){
+    fs=1;
+    if(!SubRBtn->GetValue()){SubRBtn->SetValue(true);}
+    TC2->SetFocus();
+    if(n1!=0 && n2!=0){Calculator2Frame::OnCalcBtnClick(event);}
+}
+void Calculator2Frame::MulSelect(wxCommandEvent& event){
+    fs=2;
+    if(!MulRBtn->GetValue()){MulRBtn->SetValue(true);}
+    TC2->SetFocus();
+    if(n1!=0 && n2!=0){Calculator2Frame::OnCalcBtnClick(event);}
+}
+void Calculator2Frame::DivSelect(wxCommandEvent& event){
+    fs=3;
+    if(!DivRBtn->GetValue()){DivRBtn->SetValue(true);}
+    TC2->SetFocus();
+    if(n1!=0 && n2!=0){Calculator2Frame::OnCalcBtnClick(event);}
+}
+
+
+/*ClearFields: Clears all text fields*/
+void Calculator2Frame::ClearFields(wxCommandEvent& event){
+    TC1->Clear();
+    TC2->Clear();
+    AnswerBox->Clear();
+    TC1->SetFocus();
+}
+
+
+/*AnswerPrint: Prints the answer to AnswerBox -- could be merged with TCPrint*/
+void Calculator2Frame::AnswerPrint(wxString rtnStr){
+    if(rtn<0){AnswerBox->SetDefaultStyle(wxTextAttr(*wxRED));}
+    AnswerBox->Clear();
+    std::ostream stream(AnswerBox);
+    stream << rtnStr;
+    stream.flush();
+    AnswerBox->SetDefaultStyle(wxTextAttr(*wxBLACK));
+}
+
+void Calculator2Frame::OnKeyDown(wxKeyEvent& event)
+{
+    if(event.GetKeyCode() == WXK_ADD){
+        //wxMessageBox("+");
+    }
+}
+
+/*Prints t TC1*/
+void Calculator2Frame::TCPrint(wxTextCtrl* dest, wxString str){
+            dest->Clear();
+            std::ostream stream(dest);
+            stream << str;
+            stream.flush();
+}
+
+/*OnTC1Text: Lets user hit + - * and / to select function */
+ void Calculator2Frame::OnTC1Text(wxCommandEvent& event)
+{
+    wxString st1=TC1->GetLineText(0);
+    wxString rpls;
+    std::string st2;
+    st2 = st1.ToStdString();
+    int i = st2.length()-1;
+    char ch1 = st2[i];
+    wxTextCtrl* tP1 = TC1;
+    //rpls = st1;
+    /*if(userText){*/rpls = st1.Mid(0, i);/*}*/
+
+    if (ch1 == '+'){
+        TCPrint(tP1, rpls);
+        TC2->SetFocus();
+        Calculator2Frame::AddSelect(event);
+
+    }else if(ch1 =='-' && TC1->GetLineLength(0)!=1){
+        TCPrint(tP1, rpls);
+        TC2->SetFocus();
+        Calculator2Frame::SubSelect(event);
+
+    }else if(ch1 == '*'){
+        TCPrint(tP1, rpls);
+        TC2->SetFocus();
+        Calculator2Frame::MulSelect(event);
+
+    }else if(ch1 == '/'){
+        TCPrint(tP1, rpls);
+        TC2->SetFocus();
+        Calculator2Frame::DivSelect(event);
+    }
+
+}
+/* OnR2RClick - Result to Right text box */
+void Calculator2Frame::OnR2RClick(wxCommandEvent& event)
+{
+    wxTextCtrl* tP1 = TC1;
+    wxString answer = AnswerBox->GetLineText(0);
+    TCPrint(tP1, answer);
+    Calculator2Frame::OnCalcBtnClick(event);
+    TC2->SetFocus();
+    TC2->SetSelection(0,TC2->GetLineLength(0));
+    Calculator2Frame::OnCalcBtnClick(event);
+
+}
+/* OnR2LClick - Result to Left text box */
+void Calculator2Frame::OnR2LClick(wxCommandEvent& event)
+{
+    wxTextCtrl* tP2 = TC2;
+    wxString answer = AnswerBox->GetLineText(0);
+    TCPrint(tP2, answer);
+    Calculator2Frame::OnCalcBtnClick(event);
+    TC1->SetFocus();
+    TC1->SetSelection(0,TC1->GetLineLength(0));
+}

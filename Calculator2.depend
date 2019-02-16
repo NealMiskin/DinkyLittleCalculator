@@ -1,0 +1,27 @@
+# depslib dependency file v1.0
+1548201903 source:/Users/Neal1/Programming/Calculator2/Calculator2App.cpp
+	"Calculator2App.h"
+	"Calculator2Main.h"
+	<wx/image.h>
+
+1548290892 /Users/Neal1/Programming/Calculator2/Calculator2App.h
+	</usr/local/include/wx-3.0/wx/app.h>
+
+1550278093 /Users/Neal1/Programming/Calculator2/Calculator2Main.h
+	<wx/stattext.h>
+	<wx/menu.h>
+	<wx/textctrl.h>
+	<wx/radiobut.h>
+	<wx/panel.h>
+	<wx/button.h>
+	<wx/frame.h>
+	<wx/statusbr.h>
+
+1550279789 source:/Users/Neal1/Programming/Calculator2/Calculator2Main.cpp
+	"Calculator2Main.h"
+	<wx/msgdlg.h>
+	<wx/event.h>
+	<iostream>
+	<wx/intl.h>
+	<wx/string.h>
+
