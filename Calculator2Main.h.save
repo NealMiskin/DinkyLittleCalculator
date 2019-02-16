@@ -46,7 +46,7 @@ class Calculator2Frame: public wxFrame
         void AnswerPrint(wxString rtnStr);
         void OnAddBtnClick(wxCommandEvent& event);
         void AddSelect(wxCommandEvent& event, bool noClick);
-        void DivSelect(wxCommandEvent& event, bool noClick);
+        void DivSelect(wxCommandEvent& event);
         void OnPanel1Paint1(wxPaintEvent& event);
         void OnSubBtnClick(wxCommandEvent& event);
         void OnMulBtnClick(wxCommandEvent& event);
